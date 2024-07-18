@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-Talk</title>
+    <link rel="stylesheet" href="/static/stat.css">
+</head>
+
+<body>
+    <div class="container" id="mainbox">
+        <h1 class="display-4">!!! TEXT-TALK !!!</h1>
+        <p class="lead">retreive the best summary for your text.</p>
+        <p class="choice">convert text to speech or speech to text</p>
+    </div>
+    <div class="eablocks">
+    <div class="extractive">
+        <h2 class="exhead">EXTRACTIVE SUMMARY</h2>
+        <P class="expara">this will give a summary which contains unmodified sentences from the origiinal text</P>
+        <form action="/analyze" method="POST">
+            <textarea name="rawtext" class="form-control", rows=3, placeholder="enter your raw text"></textarea>
+            <button class="btn b-primary" type="submit">Submit</button>
+            
+            </form>        
+    </div>
+    <div class="abstractive">
+        <h2 class="abhead">ABSTRACTIVE SUMMARY</h2>
+        <P class="abpara">this will give a summary which contains modified sentences from the original text</P>
+        <form action="/analyze2" method="POST">
+            <textarea name="raw" class="form-control", rows=3, placeholder="enter your raw text"></textarea>
+            <button class="btn b-primary" type="submit">Submit</button>
+            
+            </form>        
+    </div>
+</div>
+   
+<div class="summblock">
+        <h4>Original text entered-</h4>
+        <p class="ogtxt">{{og}}</p>
+        <p>Words = {{l1}}
+            
+        </p>
+        <h4>Summary-</h4>
+       <p class="summarytxt">{{summaryy}}</p>
+       <p>Words = {{l2}}</p>
+</div>
+    
+<div class="tts">
+    <h2>Convert text to speech</h2>
+    <form id="tts-form">
+        <textarea id="text-input" class="area" rows="5" cols="40" placeholder="Enter text here..."></textarea>
+        <br>
+        <button type="submit" class="convert btn">Convert to Speech</button>
+    </form>
+    <audio id="audio" controls></audio>
+</div>
+<script src="/static/script.js"></script>
+
+</div>
+   
+    <div class="sts">
+        <h1>Speech to Text Converter</h1>
+        <form id="uploadForm">
+            <input type="file" id="fileInput" accept=".mp3" required>
+            <button type="submit">Upload and Convert</button>
+        </form>
+        <div class="output" id="output"></div>
+    
+        <script>
+            document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fileInput = document.getElementById('fileInput');
+                if (fileInput.files.length === 0) {
+                    alert('Please select an MP3 file to upload');
+                    return;
+                }
+    
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+    
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        document.getElementById('output').textContent = `Error: ${errorData.error}`;
+                    } else {
+                        const data = await response.json();
+                        document.getElementById('output').textContent = `Text: ${data.text}`;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('output').textContent = 'Error: An error occurred while uploading the file';
+                }
+            });
+        </script>
+ 
+
+    </div>
+
+</body>
+</html>
